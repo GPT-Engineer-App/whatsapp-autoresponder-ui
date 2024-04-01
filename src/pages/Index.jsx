@@ -8,16 +8,56 @@ const DEFAULT_ITEM = {
   url: "",
   redirect: null,
   timeout: 0,
+  subItems: [],
 };
 
 const Index = () => {
   const [tree, setTree] = useState([DEFAULT_ITEM]);
   const [selected, setSelected] = useState(null);
+
+  const deleteSubItem = (parentIndex, subIndex) => {
+    setTree(
+      tree.map((item, index) => {
+        if (index === parentIndex) {
+          return {
+            ...item,
+            subItems: item.subItems.filter((_, i) => i !== subIndex),
+          };
+        }
+        return item;
+      }),
+    );
+  };
+
+  const updateSubItem = (parentIndex, subIndex, field, value) => {
+    setTree(
+      tree.map((item, index) => {
+        if (index === parentIndex) {
+          return {
+            ...item,
+            subItems: item.subItems.map((subItem, i) => {
+              if (i === subIndex) {
+                return { ...subItem, [field]: value };
+              }
+              return subItem;
+            }),
+          };
+        }
+        return item;
+      }),
+    );
+  };
   const toast = useToast();
 
   const addItem = (parentIndex) => {
-    setTree([...tree.slice(0, parentIndex + 1), DEFAULT_ITEM, ...tree.slice(parentIndex + 1)]);
-    setSelected(parentIndex + 1);
+    setTree(
+      tree.map((item, index) => {
+        if (index === parentIndex) {
+          return { ...item, subItems: [...item.subItems, DEFAULT_ITEM] };
+        }
+        return item;
+      }),
+    );
   };
 
   const deleteItem = (index) => {
@@ -119,6 +159,21 @@ const Index = () => {
                   <Spacer />
                   <IconButton icon={<FaTrash />} aria-label="Delete Item" onClick={() => deleteItem(index)} />
                 </Flex>
+                {item.subItems.map((subItem, subIndex) => (
+                  <Box key={subIndex} mt={4} p={4} borderWidth={1} borderRadius="md">
+                    <Flex align="center" mb={2}>
+                      <Text fontWeight="bold" mr={2}>
+                        Sub-Question {subIndex + 1}
+                      </Text>
+                      <Spacer />
+                      <IconButton icon={<FaTrash />} aria-label="Delete Sub-Item" onClick={() => deleteSubItem(index, subIndex)} />
+                    </Flex>
+                    <Stack spacing={2}>
+                      <Input value={subItem.question} placeholder="Enter sub-question" onChange={(e) => updateSubItem(index, subIndex, "question", e.target.value)} />
+                      <Textarea value={subItem.answer} placeholder="Enter sub-answer" onChange={(e) => updateSubItem(index, subIndex, "answer", e.target.value)} />
+                    </Stack>
+                  </Box>
+                ))}
               </AccordionPanel>
             </AccordionItem>
           </Accordion>
