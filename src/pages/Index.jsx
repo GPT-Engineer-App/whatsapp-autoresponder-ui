@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Box, Heading, Text, Button, Input, Textarea, Stack, IconButton, Flex, Spacer, Divider, useToast } from "@chakra-ui/react";
-import { FaPlus, FaTrash, FaEdit, FaSave } from "react-icons/fa";
+import { Box, Heading, Text, Button, Input, Textarea, Stack, IconButton, Flex, Spacer, Divider, useToast, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon } from "@chakra-ui/react";
+import { FaPlus, FaTrash, FaSave } from "react-icons/fa";
 
 const DEFAULT_ITEM = {
   question: "",
@@ -94,13 +94,34 @@ const Index = () => {
 
           <Divider />
 
-          <Flex mt={4}>
-            <Button leftIcon={<FaPlus />} onClick={() => addItem(index)}>
-              Add Sub-Item
-            </Button>
-            <Spacer />
-            {selected === index ? <IconButton icon={<FaEdit />} aria-label="Deselect Item" onClick={() => setSelected(null)} /> : <IconButton icon={<FaEdit />} aria-label="Select Item" onClick={() => selectItem(index)} />}
-          </Flex>
+          <Accordion allowToggle>
+            <AccordionItem>
+              <h2>
+                <AccordionButton>
+                  <Box flex="1" textAlign="left">
+                    Question {index + 1}
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h2>
+              <AccordionPanel pb={4}>
+                <Stack spacing={2} mb={4}>
+                  <Input value={item.question} placeholder="Enter question" onChange={(e) => updateItem(index, "question", e.target.value)} />
+                  <Textarea value={item.answer} placeholder="Enter answer" onChange={(e) => updateItem(index, "answer", e.target.value)} />
+                  <Input value={item.url} placeholder="Enter URL (optional)" onChange={(e) => updateItem(index, "url", e.target.value)} />
+                  <Input value={item.redirect} placeholder="Enter redirect question index (optional)" onChange={(e) => updateItem(index, "redirect", e.target.value)} />
+                  <Input value={item.timeout} placeholder="Enter timeout in seconds (optional)" onChange={(e) => updateItem(index, "timeout", e.target.value)} />
+                </Stack>
+                <Flex>
+                  <Button leftIcon={<FaPlus />} onClick={() => addItem(index)}>
+                    Add Sub-Item
+                  </Button>
+                  <Spacer />
+                  <IconButton icon={<FaTrash />} aria-label="Delete Item" onClick={() => deleteItem(index)} />
+                </Flex>
+              </AccordionPanel>
+            </AccordionItem>
+          </Accordion>
         </Box>
       ))}
     </Box>
