@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, Heading, Text, Button, Input, Textarea, Stack, IconButton, Flex, Spacer, Divider, useToast, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon } from "@chakra-ui/react";
-import { FaPlus, FaTrash, FaSave } from "react-icons/fa";
+import { FaTrash, FaSave } from "react-icons/fa";
+import OptionPalette from "../components/OptionPalette";
 
 const DEFAULT_ITEM = {
   question: "",
@@ -49,15 +50,19 @@ const Index = () => {
   };
   const toast = useToast();
 
-  const addItem = (parentIndex) => {
-    setTree(
-      tree.map((item, index) => {
-        if (index === parentIndex) {
-          return { ...item, subItems: [...item.subItems, DEFAULT_ITEM] };
-        }
-        return item;
-      }),
-    );
+  const addItem = (type, parentIndex) => {
+    if (type === "question") {
+      setTree([...tree, DEFAULT_ITEM]);
+    } else if (type === "subQuestion") {
+      setTree(
+        tree.map((item, index) => {
+          if (index === parentIndex) {
+            return { ...item, subItems: [...item.subItems, DEFAULT_ITEM] };
+          }
+          return item;
+        }),
+      );
+    }
   };
 
   const deleteItem = (index) => {
@@ -101,10 +106,9 @@ const Index = () => {
     <Box p={4}>
       <Heading mb={4}>WhatsApp Auto-Response Tree Editor</Heading>
 
+      <OptionPalette onAddItem={(type) => addItem(type, tree.length - 1)} />
+
       <Flex mb={4}>
-        <Button leftIcon={<FaPlus />} onClick={() => addItem(tree.length - 1)}>
-          Add Item
-        </Button>
         <Spacer />
         <Button leftIcon={<FaSave />} onClick={saveTree}>
           Save
@@ -152,10 +156,7 @@ const Index = () => {
                   <Input value={item.redirect} placeholder="Enter redirect question index (optional)" onChange={(e) => updateItem(index, "redirect", e.target.value)} />
                   <Input value={item.timeout} placeholder="Enter timeout in seconds (optional)" onChange={(e) => updateItem(index, "timeout", e.target.value)} />
                 </Stack>
-                <Flex>
-                  <Button leftIcon={<FaPlus />} onClick={() => addItem(index)}>
-                    Add Sub-Item
-                  </Button>
+                <Flex mb={4}>
                   <Spacer />
                   <IconButton icon={<FaTrash />} aria-label="Delete Item" onClick={() => deleteItem(index)} />
                 </Flex>
